@@ -1,6 +1,6 @@
 # Final Project Proposal
 
-**GitHub Repo URL**: **[final-project-the-evaluators](https://github.com/CMU-IDS-2022/final-project-the-evaluators)**
+**GitHub Repo URL**: **[https://github.com/CMU-IDS-2022/final-project-the-evaluators](https://github.com/CMU-IDS-2022/final-project-the-evaluators)**
 
 ## Team Name: The Evaluators 
 
