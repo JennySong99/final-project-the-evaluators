@@ -2,14 +2,6 @@
 
 **GitHub Repo URL**: **[final-project-the-evaluators](https://github.com/CMU-IDS-2022/final-project-the-evaluators)**
 
-
-
-### Interactive Data Science (Spring 2022)
-
-
-# Final Project: Proposal
-
-
 ## Team Name: The Evaluators 
 
 
