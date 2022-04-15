@@ -53,6 +53,17 @@ Link to FCE website: **[https://mwfo3.smartevals.com/Reporting/Students/Wizard.a
 
 ## **Data Exploration**
 
+Do you have to do substantial data cleanup? What quantities do you plan to derive from your data? How will data processing be implemented?  Show some screenshots of your data to demonstrate you have explored it.
+
+We downloaded our data from CMU Smartevals Website. The data was available for download in CSV Format and the data was quite structured. It did not require significant cleaning effort.
+
+We did some exploratory data analysis on the data such as plotting features and their descriptions. Also, calculating some basic statistics about all the numerical features. Moreover, we plotted some interesting graphs such as course rating v/s instructor rating. We plotted graphs about overall course rating vs their count in the overall dataset. It was surprising to see that the majority of the ratings are 5 like perfect ratings. 
+
+We are planning to derive metrics such as response percentage based on the total no of students and no of students responded to the survey. Also, derive top 5 departments having average highest rating for their courses. Also derive trends such as top 5 instructors and top courses. We are looking to adapt metrics such as course_load percentage such as if a course units is 12 units and it requires 20 hr/week of work, its course_load percentage would be 20/12 = 1.67
+
+We Converted our CSV File into Pandas Dataframe and printed it.
+
+![excel_df](https://user-images.githubusercontent.com/91555752/163653427-03306515-9d98-4310-b772-9fe50e5f3023.png)
 
 
 ## **System Design and Visualizations**
