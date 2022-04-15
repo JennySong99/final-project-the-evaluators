@@ -88,24 +88,39 @@ The goal of these visualizations is to help users decide which courses to take a
 
 
 
-Course Rating vs Teacher Rating
+### Course Rating vs Teacher Rating
 These visualizations aim to give an overview of CMU course ratings. There will be 2 visualizations:
-Overall Teacher Rate X Overall Course Rate 
-Type: Scatter plot
-Encoding:
-x-axis: Overall Course Rating
-y-axis: Overall Teacher Rating
-color: Department
-size: Hrs per week
-circle: Course
-Interaction
-Filter courses by department - users can filter to see only the list of departments they want by checking the checkboxes on the side.
-Hrs. Per Week
-Type: 1-axis scatter plot
-Encoding:
-x-axis: Hrs per week
-color: department (same as the first visualization)
-Interaction
-Brush filter - users can brush the graph to filter only the range “hrs per week” they want to focus on. The filter will be applied to the first 
+
+1. Overall Teacher Rate X Overall Course Rate 
+   * Type: Scatter plot
+   * Encoding:
+      * x-axis: Overall Course Rating
+      * y-axis: Overall Teacher Rating
+      * color: Department
+      * size: Hrs per week
+      * circle: Course
+    * Interaction:
+      * Filter courses by department - users can filter to see only the list of departments they want by checking the checkboxes on the side.
+
+2. Hrs. Per Week
+   * Type: 1-axis scatter plot
+   * Encoding:
+      * x-axis: Hrs per week
+      * color: department (same as the first visualization)
+   * Interaction
+      * Brush filter - users can brush the graph to filter only the range “hrs per week” they want to focus on. The filter will be applied to the first 
+<img width="486" alt="Screen Shot 2022-04-15 at 7 38 17 PM" src="https://user-images.githubusercontent.com/51781106/163652791-bd509da3-fae9-4b4e-80bd-0fbd53e36af3.png">
+
+3. Hrs per Week panel
+This visualization will show the sum amount of “hrs per week of the selected courses”. The goal of this visualization is to show the commitment (hrs per week) they will have to give if they decide to register for all the selected courses. This visualization will be on the fixed panel so that the users will always see it.
+   * Type: 1-axis bar chart.
+   * Encoding:
+      * x-axis: sum of “hrs per week”
+      * color: Courses
+
+
+<img width="347" alt="Screen Shot 2022-04-15 at 7 38 37 PM" src="https://user-images.githubusercontent.com/51781106/163653257-4bac3b44-940c-47c5-ad0e-4c5505aaae9a.png">
+
+
 
 
