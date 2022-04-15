@@ -52,6 +52,77 @@ The data will be exported from CMU’s Faculty Course Evaluations (FCE) website.
 Link to FCE website: **[https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True](https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True)**
 
 
-## **System Design**
+## **System Design and Visualizations**
 
-![Untitled (1)-6](https://user-images.githubusercontent.com/51781106/163651706-11beabdd-233a-48e6-b8ec-27282fa3e54c.jpg)
+
+<img width="517" alt="Screen Shot 2022-04-15 at 7 20 24 PM" src="https://user-images.githubusercontent.com/51781106/163651920-3aa0fe7b-fcf5-4fb3-a513-51d2c5e616d9.png">
+
+### Compare Course Rating
+
+The goal of these visualizations is to help users decide which courses to take among the courses they are interested in. There will be three components for this part:
+
+1. First ordered list item
+2. Another item
+⋅⋅* Unordered sub-list. 
+1. Actual numbers don't matter, just that it's a number
+⋅⋅1. Ordered sub-list
+4. And another item.
+⋅⋅⋅You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).
+⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅
+⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅
+⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
+
+* Unordered list can use asterisks
+- Or minuses
++ Or pluses
+
+1. Search Panel
+   Users can search for the courses they want to compare in these visualizations.
+2. Latest Year Compare - Compare only the latest year ratings of each course.
+   * Type: Bar chart
+   * Encoding:
+      * x-axis: rating type
+      * y-axis: rating value
+      * color: course
+   * Interaction:
+      * Users can select the ratings they want to compare from the list aside from the graph.
+3. Rating Over Time - Compare one rating over time.
+   * Type: Line graph
+   * Encoding:
+      * x-axis: date
+      * y-axis: rating value
+      * color: course
+      * line type: instructor
+   *Interaction:
+      * Users can select a rating they want to compare from the dropdown menu.
+
+
+
+
+
+
+
+
+
+
+Course Rating vs Teacher Rating
+These visualizations aim to give an overview of CMU course ratings. There will be 2 visualizations:
+Overall Teacher Rate X Overall Course Rate 
+Type: Scatter plot
+Encoding:
+x-axis: Overall Course Rating
+y-axis: Overall Teacher Rating
+color: Department
+size: Hrs per week
+circle: Course
+Interaction
+Filter courses by department - users can filter to see only the list of departments they want by checking the checkboxes on the side.
+Hrs. Per Week
+Type: 1-axis scatter plot
+Encoding:
+x-axis: Hrs per week
+color: department (same as the first visualization)
+Interaction
+Brush filter - users can brush the graph to filter only the range “hrs per week” they want to focus on. The filter will be applied to the first 
+
+
