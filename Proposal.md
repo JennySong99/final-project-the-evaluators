@@ -99,12 +99,7 @@ The goal of these visualizations is to help users decide which courses to take a
    *Interaction:
       * Users can select a rating they want to compare from the dropdown menu.
 
-
-
-
-
-
-
+<img width="506" alt="Screen Shot 2022-04-15 at 7 37 42 PM" src="https://user-images.githubusercontent.com/51781106/163652788-160689f5-5bc0-4d13-9831-11a6b63f0aed.png">
 
 
 
