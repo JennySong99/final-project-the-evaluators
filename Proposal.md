@@ -21,24 +21,6 @@
 
 **Stakeholders**: Students, Course Instructors, Department Heads
 
-**Problem for students:**
-
-
-
-* The course workload does not match the unit count
-* Without the ratings in SOC, it’s hard to determine the quality of the course.
-* Overall course ratings do not give an idea about criteria like content quality, knowledge of the instructor, perceived courseload, etc.
-* Don’t know when to take the course because cannot compare courses by different professors.
-* As a result, students aren’t able to make the most well-informed decision.
-
-**Problem for instructors and department heads:**
-
-
-
-* Hard to evaluate the historical performance of the course.
-* Having a visual comparison of how similar courses are performing on different criteria would help each instructor and department heads to improve their courses.
-* They can’t anticipate the volume of interest in a course, having some predictions would help them manage resources and offerings.
-
 
 ## **Research Question**:
 
@@ -61,13 +43,6 @@
 * Visualize the progress of each course through years. 
     * Many courses have been offered for many years, some of them are getting better score, some of them might get worse. By visualizing the progress of the course, we can see the trend of the course, and how well each professor does.
 
-**Further ideas**
-
-
-
-* Predict how much interest of the students (How many students would be interested to take the course)
-* Map with the course schedule data to provide students with the course data while planning their schedule for next semester. [https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/search](https://enr-apps.as.cmu.edu/open/SOC/SOCServlet/search)
-* Visualize course data under same department. 
 
 
 ## **Data**
@@ -75,3 +50,8 @@
 The data will be exported from CMU’s Faculty Course Evaluations (FCE) website.  
 
 Link to FCE website: **[https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True](https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True)**
+
+
+## **System Design**
+
+![Untitled (1)-6](https://user-images.githubusercontent.com/51781106/163651706-11beabdd-233a-48e6-b8ec-27282fa3e54c.jpg)
