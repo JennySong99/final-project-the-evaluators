@@ -51,6 +51,9 @@ The data will be exported from CMU’s Faculty Course Evaluations (FCE) website.
 
 Link to FCE website: **[https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True](https://mwfo3.smartevals.com/Reporting/Students/Wizard.aspx?Type=Sections&FiveYearsOnly=True)**
 
+## **Data Exploration**
+
+
 
 ## **System Design and Visualizations**
 
