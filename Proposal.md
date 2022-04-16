@@ -65,6 +65,24 @@ We Converted our CSV File into Pandas Dataframe and printed it.
 
 ![excel_df](https://user-images.githubusercontent.com/91555752/163653427-03306515-9d98-4310-b772-9fe50e5f3023.png)
 
+![unnamed](https://user-images.githubusercontent.com/91555752/163653602-35a62fbc-09cc-45f1-93f0-d78645625bf2.png)
+
+We printed the shape of our dataframe, information about our dataframe in order to get an idea about how the dataset is and how it is distributed. 
+
+![EDA_Basic_Statistics](https://user-images.githubusercontent.com/91555752/163653569-81710f67-7d41-4b2b-aa24-f2c18ef27669.jpg)
+
+![unnamed (1)](https://user-images.githubusercontent.com/91555752/163653662-65b2a147-3dbf-4b58-a213-94409a65d204.png)
+
+Apart from understanding our data parameters and variables in our data frame, we try to grasp an idea of how our data features are and what type they are stored as in the dataframe.
+
+We also plot some intuitive exploratory data analysis graph and visualization to get a hang of our data.
+
+![EDA_Bar_graph](https://user-images.githubusercontent.com/91555752/163653684-e68ee5a2-4365-4570-9609-baedc9dc91a8.jpg)
+
+![Figure 2022-04-15 182856](https://user-images.githubusercontent.com/91555752/163653691-102763f8-4642-4f69-8899-7f7eeced02b2.png)
+
+![unnamed (2)](https://user-images.githubusercontent.com/91555752/163653704-8b1c8b01-9317-4979-9978-6444800c0064.png)
+
 
 ## **System Design and Visualizations**
 
