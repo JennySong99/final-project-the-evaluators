@@ -7,6 +7,29 @@
   * udt@andrew.cmu.edu
   * psasapar@andrew.cmu.edu
 
+## Run the app
+* Ensure you have Python 3.6+, Node.js, and npm installed.
+* clone the repository
+* Create a new Python virtual environment for the template:
+```
+$ python3 -m venv venv  # create venv
+$ . venv/bin/activate   # activate venv
+$ pip install streamlit # install streamlit
+```
+* Initialize and run the component template frontend:
+```
+$ cd my_component/frontend
+$ npm install    # Install npm dependencies
+$ npm run start  # Start the Webpack dev server
+```
+* From a separate terminal, run the template's Streamlit app:
+```
+$ . venv/bin/activate  # activate the venv you created earlier
+$ streamlit run my_component/__init__.py  # run the example
+```
+
+
+
 ## Work distribution
 
 Update towards the end of the project.
