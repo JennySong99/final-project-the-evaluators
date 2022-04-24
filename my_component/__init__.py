@@ -82,8 +82,65 @@ def my_component(currPage):
 # app: `$ streamlit run my_component/__init__.py`
 if not _RELEASE:
     import streamlit as st
+    import pandas as pd
+    import altair as alt
+    import numpy as np
+    from utils import get_course_df
+    from utils import get_instructor_df
+    from utils import get_dept_df
 
-    
+    # st.set_page_config(layout="wide")
+
+    # ------------------------------------------------------- #
+    # Data Preparation.
+    # ------------------------------------------------------- #
+
+    numeric_columns = [
+        'hrs_per_week',
+        'total_students',
+        'responses',
+        'response_rate',
+        'interest_in_student_learning',
+        'clearly_explain_course_requirements',
+        'clear_learning_objectives_and_goals',
+        'instructor_provides_feedback',
+        'demonstrate_importance_of_subject_matter',
+        'explains_subject_matter_of_course',
+        'show_respect_for_all_students',
+        'overall_teaching_rate',
+        'overall_course_rate'
+    ]
+
+    @st.cache  # add caching so we load the data only once
+    def load_data():
+        # Load the yelp data.
+        fce_data_url = "./fce-data.csv"
+        raw_df = pd.read_csv(fce_data_url)
+        df = raw_df
+        df.dropna(inplace=True)
+        # Convert numeric columns
+        for nc in numeric_columns:
+            df[nc] = pd.to_numeric(df[nc])
+
+        # Filter data
+        df = df[(df['total_students'] > 5) & (df['total_students'] <= 325)] # Remove Outlier
+        df = df[df['response_rate'] > 0.4]
+        df = df[df['college'] != 'Teaching Assistants']
+
+        # df['overall_rate'] = df[(df['overall_course_rate'] + df['overall_teaching_rate'] + df['show_respect_for_all_students']) / 3]
+        return df
+
+    # Dataframes
+    # To create a new dataframe for each visualization, use the df as a main. Copy using df.copy() and modify the copy dataframe.
+    # Do not modify main df dataframe.
+    df = load_data()
+    course_df = get_course_df(df)
+    instructor_df = get_instructor_df(df)
+    dept_df = get_dept_df(df)
+
+    # ------------------------------------------------------- #
+    # Main
+    # ------------------------------------------------------- #
 
     # Create an instance of our component with a constant `name` arg, and
     # print its output value.
@@ -94,9 +151,119 @@ if not _RELEASE:
     # st.write(curr_page)
     # if(curr_state and "currPage" in curr_state):
     #     curr_page = curr_state["currPage"]
-
     if curr_page == 0:
-        st.header("Home")
+        # -- Header -- #
+        st.header("What Courses to take?")
+        st.markdown("Because your time is precious, and the tuition is high, please make the right decision.")
+        st.markdown("Learn about CMU courses from the faculty course evaluation data. Explore and compare courses you are interested in before making the decision.")
+
+        st.markdown("""---""")
+        # -- Top Trend Section -- #
+        trend_cols = st.columns(3)
+        top_courses = course_df.sort_values('overall_course_rate', ascending=False).head(5)
+        top_instructors = instructor_df.sort_values('overall_teaching_rate', ascending=False).head(5)
+        top_depts = instructor_df.sort_values(['overall_course_rate', 'overall_teaching_rate'], ascending=False).head(5)
+        with trend_cols[0]:
+            st.subheader("Top Courses")
+            for index, row in top_courses.iterrows():
+                st.markdown(row['course_name'])
+        with trend_cols[1]:
+            st.subheader("Top Instructors")
+            for index, row in top_instructors.iterrows():
+                st.markdown(row['instructor'])
+        with trend_cols[2]:
+            st.subheader("Top Department")
+            for index, row in top_depts.iterrows():
+                st.markdown(row['dept'] + ' - ' + row['college'])
+
+        st.markdown("""---""")
+        # -- Explore Section -- #
+        st.subheader("Explore by yourself")
+        st.markdown("Filter the courses and learn how well the coures and the instructors. Selecting the course on the graph to see the workload. Brushing the bottom graph to filter only course with right workload.")
+
+        # -- Filters -- #
+        filter_cols = st.columns(3)
+        year_filters=[]
+        sem_filters=[]
+        course_level_filters=[]
+        college_filters=[]
+        cols = st.columns(3)
+        with filter_cols[0]:
+            years_options = course_df['year'].unique()
+            year_filters = st.multiselect(
+                "Select years",
+                years_options,
+                [2022, 2021]
+            )
+        with filter_cols[1]:
+            course_level_options = course_df['course_level'].unique()
+            course_level_filters = st.multiselect(
+                "Select course lebel",
+                course_level_options,
+                ['Graduate', 'Undergraduate']
+            )
+        with filter_cols[2]:
+            semester_options = course_df['semester'].unique()
+            sem_filters = st.multiselect(
+                "Select semester",
+                semester_options,
+                ['Spring', 'Fall']
+            )
+        college_options = course_df['college'].unique()
+        college_filters = st.multiselect(
+            "Select schools",
+            college_options,
+            ['School of Computer Science', 'Tepper School of Business', 'Heinz College']
+        )
+        course_df_filter = course_df
+        course_df_filter = course_df_filter[course_df_filter['year'].isin(year_filters)]
+        course_df_filter = course_df_filter[course_df_filter['semester'].isin(sem_filters)]
+        course_df_filter = course_df_filter[course_df_filter['course_level'].isin(course_level_filters)]
+        course_df_filter = course_df_filter[course_df_filter['college'].isin(college_filters)]
+
+        # -- Scatter Plots -- #
+        explore_brush = alt.selection_interval()
+        selector = alt.selection_single(empty='all', fields=['num'])
+        legend_selector = alt.selection_multi(fields=['college'], bind='legend')
+
+        base_scatter = alt.Chart(course_df_filter)
+        home_main_scatter = base_scatter.mark_circle(opacity=0.7, size=40).encode(
+            alt.Y("overall_teaching_rate:Q", sort="ascending", title="Overall Teaching Rate"),
+            alt.X("overall_course_rate:Q", title="Overall Course Rate"),
+            color=alt.condition(selector, 'college', alt.value('lightgray')),
+            opacity=alt.condition(legend_selector, alt.value(0.7), alt.value(0.05)),
+            tooltip=[
+                alt.Tooltip("num", title="Course Number"),
+                alt.Tooltip("course_name", title="Course Name"),
+                alt.Tooltip("hrs_per_week", title="Hrs per Week"),
+                alt.Tooltip('year', title="Year")
+            ]
+        ).properties(
+            width=600,
+            height=400,
+        ).add_selection(
+            selector,
+            legend_selector
+        ).transform_filter(
+            explore_brush
+        )
+
+        hrs_per_week_scatter = base_scatter.mark_circle(opacity=0.7, size=40).encode(
+            alt.X("hrs_per_week:Q", sort="ascending", title="Hrs per Week"),
+            color=alt.condition(selector, 'college', alt.value('lightgray')),
+            tooltip=["num", "course_name", "instructor", "hrs_per_week", "year"],
+            opacity=alt.condition(legend_selector, alt.value(0.7), alt.value(0.05))
+        ).properties(
+            width=600,
+            height=50
+        ).add_selection(
+            explore_brush,
+            legend_selector
+        ).transform_filter(
+            selector
+        )
+
+        st.write(home_main_scatter & hrs_per_week_scatter)
     elif curr_page == 1:
         st.header("Compare Courses")
     elif curr_page == 2:
@@ -120,3 +287,20 @@ if not _RELEASE:
     # name_input = st.text_input("Enter a name", value="Streamlit")
     # num_clicks = my_component(name_input, key="foo")
     # st.markdown("You've clicked %s times!" % int(num_clicks))
+
+
+# import altair as alt
+# from vega_datasets import data
+
+# source = data.unemployment_across_industries.url
+
+# selection = alt.selection_multi(fields=['series'], bind='legend')
+
+# alt.Chart(source).mark_area().encode(
+#     alt.X('yearmonth(date):T', axis=alt.Axis(domain=False, format='%Y', tickSize=0)),
+#     alt.Y('sum(count):Q', stack='center', axis=None),
+#     alt.Color('series:N', scale=alt.Scale(scheme='category20b')),
+#     opacity=alt.condition(selection, alt.value(1), alt.value(0.2))
+# ).add_selection(
+#     selection
+# )
