@@ -46,24 +46,28 @@ class MyComponent extends StreamlitComponentBase<State> {
   }
 
   public page0 = () => (
-    <div>
+    <div className="d-flex justify-content-between">
       <button
           onClick={this.handleHome}
+          className="btn btn-light"
         >
           Home
         </button>
         <button
           onClick={this.handleCompareCourse}
+          className="btn btn-light"
         >
           Compare Courses
         </button>
         <button
           onClick={this.handleCompareDepartment}
+          className="btn btn-light"
         >
           Compare Departments
         </button>
         <button
           onClick={this.handleCompareInstructor}
+          className="btn btn-light"
         >
           Compare Instructors
         </button>
@@ -71,100 +75,9 @@ class MyComponent extends StreamlitComponentBase<State> {
     </div>
   )
 
-  private page1 = () => (
-    <div>
-      <button
-          onClick={this.handleHome}
-        >
-          Home
-        </button>
-        <button
-          onClick={this.handleCompareCourse}
-        >
-          Compare Courses
-        </button>
-        <button
-          onClick={this.handleCompareDepartment}
-        >
-          Compare Departments
-        </button>
-        <button
-          onClick={this.handleCompareInstructor}
-        >
-          Compare Instructors
-        </button>
-    
-    </div>
-  )
-
-  private page2 = () => (
-    <div>
-      <button
-          onClick={this.handleHome}
-        >
-          Home
-        </button>
-        <button
-          onClick={this.handleCompareCourse}
-        >
-          Compare Courses
-        </button>
-        <button
-          onClick={this.handleCompareDepartment}
-        >
-          Compare Departments
-        </button>
-        <button
-          onClick={this.handleCompareInstructor}
-        >
-          Compare Instructors
-        </button>
-    
-    </div>
-      
-  )
-
-  private page3 = () => (
-    <div>
-      <button
-          onClick={this.handleHome}
-        >
-          Home
-        </button>
-        <button
-          onClick={this.handleCompareCourse}
-        >
-          Compare Courses
-        </button>
-        <button
-          onClick={this.handleCompareDepartment}
-        >
-          Compare Departments
-        </button>
-        <button
-          onClick={this.handleCompareInstructor}
-        >
-          Compare Instructors
-        </button>
-    
-    </div>
-      
-  )
 
   private pageContent = (): any => {
-        
-    if(this.state.currPage === 0) {
-        return this.page0();
-    }
-    if(this.state.currPage === 1) {
-        return this.page1();
-    }
-    if(this.state.currPage === 2) {
-        return this.page2();
-    }
-    if(this.state.currPage === 3) {
-        return this.page3()
-    }
+    return this.page0();
   }
 
 

@@ -88,6 +88,7 @@ if not _RELEASE:
     from utils import get_course_df
     from utils import get_instructor_df
     from utils import get_dept_df
+    from utils import options_map_to_columns
 
     # st.set_page_config(layout="wide")
 
@@ -137,20 +138,17 @@ if not _RELEASE:
     course_df = get_course_df(df)
     instructor_df = get_instructor_df(df)
     dept_df = get_dept_df(df)
-
+    options_map_to_column = options_map_to_columns
     # ------------------------------------------------------- #
     # Main
     # ------------------------------------------------------- #
 
-    # Create an instance of our component with a constant `name` arg, and
-    # print its output value.
+
     curr_state = my_component(0)
     curr_page = 0
     if curr_state:
         curr_page = curr_state["currPage"]
-    # st.write(curr_page)
-    # if(curr_state and "currPage" in curr_state):
-    #     curr_page = curr_state["currPage"]
+   
     if curr_page == 0:
         # -- Header -- #
         st.header("What Courses to take?")
@@ -266,10 +264,215 @@ if not _RELEASE:
         st.write(home_main_scatter & hrs_per_week_scatter)
     elif curr_page == 1:
         st.header("Compare Courses")
+        #--- 1. COURSE SEARCH dataprep----#
+
+        #Adding concatenation to distinguish same course names
+        course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
+        #Creating  a list of latest courses for the search
+        course_list = course_df.loc[course_df['year']> 2020]['course_name_code_year'].to_list()
+
+        #---- COURSE SEARCH Streamlit component---#
+        #options is the name of the array that contains selected options
+        course_options = st.multiselect('Select courses for comparison', course_list)
+        courseNamesArray = [" ".join(course_string.split(' ')[3:]) for course_string in course_options]
+       
+        options = st.multiselect(
+        'Please Select Features You Want to Compare',
+        ['Overall teaching rate','Overall course rate', 'Interest in student learning', 'Clearly explain course requirements', 'Clear learning objectives & goals', 'Demonstrate importance of subject matter','Instructor provides feedback to students to improve','Explains subject matter of course','Show respect for all students'],
+        ['Overall teaching rate','Overall course rate'])
+ 
+
+        # convert options to column names
+        options_columns = [options_map_to_column[option] for option in options]
+
+        if(len(course_options)>0):
+           
+            st.markdown("""---""")
+            # first chart
+            
+            filter_df1 = course_df.groupby(['course_name_code_year'])[options_columns].mean().reset_index()
+            filter_df = filter_df1.loc[course_df['course_name_code_year'].isin(course_options)]
+
+            reshaped_filter_df = filter_df.melt(id_vars=['course_name_code_year'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
+            selection_legend = alt.selection_multi(fields=['course_name_code_year'], bind='legend')
+
+            compare_course_ratings = alt.Chart(reshaped_filter_df).mark_bar(tooltip=True).transform_calculate(
+                y="split(datum.y, '_')"
+            ).encode(
+                y=alt.Y('course_name_code_year:O', type="nominal", axis=alt.Axis(title=None, labels=False)),
+                x=alt.X('Rating:Q',axis=alt.Axis(grid=False)),
+                color=alt.Color('course_name_code_year:N',legend=alt.Legend(title="Course Name", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
+            ).properties(
+                title="Compare Ratings for Selected Courses", 
+                width=400,
+            ).configure_title(
+                anchor='middle',
+            ).add_selection(
+                selection_legend
+            ).configure_legend(labelLimit= 0)
+
+
+            st.altair_chart(compare_course_ratings)
+
+            st.markdown("""---""")
+            
+            
+            # second chart
+
+            course_df2 = course_df.groupby(['course_name','year'])['overall_course_rate'].mean().reset_index()
+
+            filter_df2 = course_df2.loc[course_df2['course_name'].isin(courseNamesArray)]
+
+            selection_legend = alt.selection_multi(fields=['course_name'], bind='legend')
+            
+
+            compare_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
+                x = alt.X("year:N", title="Year"),
+                y= alt.Y("overall_course_rate"),
+                color=alt.Color("course_name:N", legend=alt.Legend(title="Course Name", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2))
+            ).properties(
+                title="Compare Course Ratings Over the years", 
+                width=750,
+                height=500
+            ).add_selection(
+                selection_legend
+            )
+
+            st.altair_chart(compare_rating_over_years)
+
+
+
+
     elif curr_page == 2:
         st.header("Compare Departments")
+        #Creating  a list of department for the search
+        dept_df["dept_name_college"] = dept_df["dept"] + ' '  + dept_df["college"]
+        dept_list = set(dept_df['dept_name_college'].to_list())
+
+        #--- DEPARTMENT SEARCH Streamlit component --#
+        #options is the name of the array that contains selected options
+        options_dept = st.multiselect('Select department for comparison', dept_list)
+
+        options = st.multiselect(
+        'Please Select Features You Want to Compare',
+        ['Overall teaching rate','Overall course rate', 'Interest in student learning', 'Clearly explain course requirements', 'Clear learning objectives & goals', 'Demonstrate importance of subject matter','Instructor provides feedback to students to improve','Explains subject matter of course','Show respect for all students'],
+        ['Overall teaching rate','Overall course rate'])
+
+
+
+        # convert options to column names
+        options_columns = [options_map_to_column[option] for option in options]
+
+        if(len(options_dept)>0):
+            filter_df1 = dept_df.loc[dept_df['year'] == 2021]
+            filter_df2 = filter_df1.groupby(['dept_name_college'])[options_columns].mean().reset_index()
+            filter_df3 = filter_df2.loc[filter_df2['dept_name_college'].isin(options_dept)]
+            reshaped_filter_df = filter_df3.melt(id_vars=['dept_name_college'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='dept_name_college').reset_index(drop=True)
+            selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
+
+            compare_dept_ratings = alt.Chart(reshaped_filter_df).mark_bar(tooltip=True).transform_calculate(
+                y="split(datum.y, '_')"
+            ).encode(
+                y=alt.Y('dept_name_college:O', type="nominal", axis=alt.Axis(title=None, labels=False)),
+                x=alt.X('Rating:Q',axis=alt.Axis(grid=False)),
+                color=alt.Color('dept_name_college:N',legend=alt.Legend(title="Department Name", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
+            ).properties(
+                title="Compare Ratings for Selected Departments from 2021", 
+                width=400,
+            ).configure_title(
+                anchor='middle',
+            ).add_selection(
+                selection_legend
+            ).configure_legend(labelLimit= 0)
+
+
+            st.altair_chart(compare_dept_ratings)
+
+            st.markdown("""---""")
+
+            # second chart
+            dept_df2 = dept_df.groupby(['dept_name_college','year'])['overall_course_rate'].mean().reset_index()
+
+            filter_df2 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
+
+            selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
+            
+
+            compare_dept_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
+                x = alt.X("year:N", title="Year"),
+                y= alt.Y("overall_course_rate"),
+                color=alt.Color("dept_name_college:N", legend=alt.Legend(title="Department Name", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2))
+            ).properties(
+                title="Compare Course Ratings Over the years", 
+                width=750,
+                height=500
+            ).add_selection(
+                selection_legend
+            )
+
+            st.altair_chart(compare_dept_rating_over_years)
+
+
     elif curr_page == 3:
         st.header("Compare Instructors")
+        #--- 3. INSTRUCTOR SEARCH dataprep----#
+
+        #Creating  a list of instructors for the search
+        instructor_list = instructor_df['instructor'].to_list()
+
+        #---INSTRUCTOR SEARCH Streamlit component--#
+        #options is the name of the array that contains selected options
+        options_instructor = st.multiselect('Select instructors for comparison', instructor_list)
+
+        options = st.multiselect(
+        'Please Select Features You Want to Compare',
+        ['Overall teaching rate','Overall course rate', 'Interest in student learning', 'Clearly explain course requirements', 'Clear learning objectives & goals', 'Demonstrate importance of subject matter','Instructor provides feedback to students to improve','Explains subject matter of course','Show respect for all students'],
+        ['Overall teaching rate','Overall course rate'])
+ 
+
+        # convert options to column names
+        options_columns = [options_map_to_column[option] for option in options]
+
+        if(len(options_instructor)>0):
+           
+            st.markdown("""---""")
+            # first chart
+            
+            filter_df1 = instructor_df.groupby(['instructor'])[options_columns].mean().reset_index()
+            filter_df = filter_df1.loc[instructor_df['instructor'].isin(options_instructor)]
+
+            reshaped_filter_df = filter_df.melt(id_vars=['instructor'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='instructor').reset_index(drop=True)
+            selection_legend = alt.selection_multi(fields=['instructor'], bind='legend')
+
+            compare_inst_ratings = alt.Chart(reshaped_filter_df).mark_bar(tooltip=True).transform_calculate(
+                y="split(datum.y, '_')"
+            ).encode(
+                y=alt.Y('instructor:O', type="nominal", axis=alt.Axis(title=None, labels=False)),
+                x=alt.X('Rating:Q',axis=alt.Axis(grid=False)),
+                color=alt.Color('instructor:N',legend=alt.Legend(title="Instructor ", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
+            ).properties(
+                title="Compare Ratings for Selected Instructors", 
+                width=400,
+            ).configure_title(
+                anchor='middle',
+            ).add_selection(
+                selection_legend
+            ).configure_legend(labelLimit= 0)
+
+
+            st.altair_chart(compare_inst_ratings)
+
+            st.markdown("""---""")
+            
+
     # st.write(currPage)
     # st.markdown("You've clicked %s times!" % int(num_clicks))
 

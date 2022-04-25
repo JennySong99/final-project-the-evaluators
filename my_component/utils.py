@@ -53,7 +53,7 @@ def get_instructor_df(df):
     return instructor_df
 
 def get_dept_df(df):
-    dept_df = df.groupby(['dept'])
+    dept_df = df.groupby(['dept', 'year', 'semester'])
     dept_df = dept_df.agg(
         college=('college', 'max'),
         hrs_per_week=('hrs_per_week', 'mean'),
@@ -72,3 +72,15 @@ def get_dept_df(df):
     )
     dept_df = dept_df.reset_index()
     return dept_df
+
+options_map_to_columns = {
+    'Interest in student learning': 'interest_in_student_learning',
+    'Clearly explain course requirements': 'clearly_explain_course_requirements',
+    'Clear learning objectives & goals': 'clear_learning_objectives_and_goals',
+    'Demonstrate importance of subject matter': 'demonstrate_importance_of_subject_matter',
+    'Instructor provides feedback to students to improve': 'instructor_provides_feedback',
+    'Explains subject matter of course': 'explains_subject_matter_of_course',
+    'Show respect for all students': 'show_respect_for_all_students',
+    'Overall teaching rate': 'overall_teaching_rate',
+    'Overall course rate': 'overall_course_rate'
+}
