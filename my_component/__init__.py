@@ -364,9 +364,9 @@ if not _RELEASE:
                 # strokeDash="instructor_combined",
                 tooltip = [alt.Tooltip(field = "course_name", title = "Course Name", type = "nominal"),
                         alt.Tooltip(field = "year", title = "Year", type = "quantitative"),
-                        alt.Tooltip(field = "overall_course_rate", title ="Average Overall Course Rating", type = "quantitative", format=".2f"),
+                        alt.Tooltip(field = "overall_course_rate", title ="Avg Overall Course Rating", type = "quantitative", format=".2f"),
                         alt.Tooltip(field = "instructor_combined", title ="Instructor", type = "nominal"),
-                        alt.Tooltip(field = "responses", title ="Average Responses", type = "quantitative")
+                        alt.Tooltip(field = "responses", title ="Avg Responses", type = "quantitative", format=".2f")
                 ],
             ).properties(
                 title="Compare Course Ratings Over the years", 
