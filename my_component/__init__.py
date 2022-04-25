@@ -272,13 +272,14 @@ if not _RELEASE:
 
         #Adding concatenation to distinguish same course names
         course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
+        course_df["course_name_code"] = course_df["num"].astype(str) + ' ' + course_df["course_name"]
         #Creating  a list of latest courses for the search
         course_list = course_df.loc[course_df['year']> 2020]['course_name_code_year'].to_list()
 
         #---- COURSE SEARCH Streamlit component---#
         #options is the name of the array that contains selected options
         course_options = st.multiselect('Select courses for comparison', course_list)
-        courseNamesArray = [" ".join(course_string.split(' ')[3:]) for course_string in course_options]
+        courseCodeArray = [course_string.split(' ')[2] for course_string in course_options]
        
         options = st.multiselect(
         'Please Select Features You Want to Compare',
@@ -311,6 +312,7 @@ if not _RELEASE:
            
             st.markdown("""---""")
             # first chart
+            st.subheader("Compare courses based on different metrics")
             
             
             selection_legend = alt.selection_multi(fields=['course_name_code_year'], bind='legend')
@@ -341,27 +343,30 @@ if not _RELEASE:
             st.altair_chart(compare_course_ratings)
 
             st.markdown("""---""")
-            
-            
-            # second chart
 
-            course_df2 = course_df.groupby(['course_name','year', 'instructor', 'responses'])['overall_course_rate'].mean().reset_index()
-            # st.write(course_df2)
-            filter_df2 = course_df2.loc[course_df2['course_name'].isin(courseNamesArray)]
+            # second chart
+            st.subheader("Compare courses over time")
+
+            course_df2 = course_df.groupby(['course_name_code','year']).agg(course_name=('course_name', 'max'), responses=('responses', 'mean'), num=('num', 'max'), instructor_combined=('instructor', lambda x: ' - '.join(x)), overall_course_rate=('overall_course_rate', 'mean'))
+
+            course_df2 = course_df2.reset_index()
+            # st.write(course_df2.head(50))
+            filter_df2 = course_df2.loc[course_df2['num'].isin(courseCodeArray)]
             # st.write(filter_df2)
-            selection_legend = alt.selection_multi(fields=['course_name'], bind='legend')
-            
+            selection_legend = alt.selection_multi(fields=['course_name_code'], bind='legend')
+
 
             compare_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
                 x = alt.X("year:N", title="Year"),
                 y= alt.Y("overall_course_rate"),
-                color=alt.Color("course_name:N", legend=alt.Legend(title="Course Name", labelFontSize=12)),
+                color=alt.Color("course_name_code:N", legend=alt.Legend(title="Course Name", labelFontSize=12)),
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                # strokeDash="instructor_combined",
                 tooltip = [alt.Tooltip(field = "course_name", title = "Course Name", type = "nominal"),
                         alt.Tooltip(field = "year", title = "Year", type = "quantitative"),
-                        alt.Tooltip(field = "overall_course_rate", title ="Overall Course Rating", type = "quantitative", format=".2f"),
-                        alt.Tooltip(field = "instructor", title ="Instructor", type = "nominal"),
-                        alt.Tooltip(field = "responses", title ="Responses", type = "quantitative")
+                        alt.Tooltip(field = "overall_course_rate", title ="Average Overall Course Rating", type = "quantitative", format=".2f"),
+                        alt.Tooltip(field = "instructor_combined", title ="Instructor", type = "nominal"),
+                        alt.Tooltip(field = "responses", title ="Average Responses", type = "quantitative")
                 ],
             ).properties(
                 title="Compare Course Ratings Over the years", 
