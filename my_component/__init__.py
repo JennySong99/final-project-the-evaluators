@@ -91,6 +91,10 @@ if not _RELEASE:
     from utils import options_map_to_columns
 
     # st.set_page_config(layout="wide")
+    st.set_page_config(
+     page_title="Course Explorer",
+     page_icon="📚",
+    )
 
     # ------------------------------------------------------- #
     # Data Preparation.
@@ -284,16 +288,31 @@ if not _RELEASE:
 
         # convert options to column names
         options_columns = [options_map_to_column[option] for option in options]
+        # print(options_columns)
+        # print(course_options)
 
-        if(len(course_options)>0):
+        course_options_length = len(course_options)
+
+        
+
+        if(course_options_length>0):
+            filter_df1 = course_df.groupby(['course_name_code_year', 'instructor', 'responses'])[options_columns].mean().reset_index()
+            filter_df = filter_df1.loc[course_df['course_name_code_year'].isin(course_options)]
+            reshaped_filter_df = filter_df.melt(id_vars=['course_name_code_year', 'instructor', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
+            
+            with st.expander("See Detail Course Info"):
+                # cols = st.columns(course_options_length)
+
+                for index, row in reshaped_filter_df.iterrows():
+                    course_name = row['course_name_code_year']
+                    instructor = row['instructor']
+                    st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor)
+                    
            
             st.markdown("""---""")
             # first chart
             
-            filter_df1 = course_df.groupby(['course_name_code_year'])[options_columns].mean().reset_index()
-            filter_df = filter_df1.loc[course_df['course_name_code_year'].isin(course_options)]
-
-            reshaped_filter_df = filter_df.melt(id_vars=['course_name_code_year'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
+            
             selection_legend = alt.selection_multi(fields=['course_name_code_year'], bind='legend')
 
             compare_course_ratings = alt.Chart(reshaped_filter_df).mark_bar(tooltip=True).transform_calculate(
@@ -304,6 +323,11 @@ if not _RELEASE:
                 color=alt.Color('course_name_code_year:N',legend=alt.Legend(title="Course Name", labelFontSize=12)),
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
                 row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
+                tooltip = [alt.Tooltip(field = "course_name_code_year", title = "Course Name", type = "nominal"),
+                        alt.Tooltip(field = "Rating", title ="Rating", type = "quantitative", format=".2f"),
+                        alt.Tooltip(field = "instructor", title ="Instructor", type = "nominal"),
+                        alt.Tooltip(field = "responses", title ="Responses", type = "quantitative")
+                ],
             ).properties(
                 title="Compare Ratings for Selected Courses", 
                 width=400,
@@ -321,10 +345,10 @@ if not _RELEASE:
             
             # second chart
 
-            course_df2 = course_df.groupby(['course_name','year'])['overall_course_rate'].mean().reset_index()
-
+            course_df2 = course_df.groupby(['course_name','year', 'instructor', 'responses'])['overall_course_rate'].mean().reset_index()
+            # st.write(course_df2)
             filter_df2 = course_df2.loc[course_df2['course_name'].isin(courseNamesArray)]
-
+            # st.write(filter_df2)
             selection_legend = alt.selection_multi(fields=['course_name'], bind='legend')
             
 
@@ -332,7 +356,13 @@ if not _RELEASE:
                 x = alt.X("year:N", title="Year"),
                 y= alt.Y("overall_course_rate"),
                 color=alt.Color("course_name:N", legend=alt.Legend(title="Course Name", labelFontSize=12)),
-                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2))
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                tooltip = [alt.Tooltip(field = "course_name", title = "Course Name", type = "nominal"),
+                        alt.Tooltip(field = "year", title = "Year", type = "quantitative"),
+                        alt.Tooltip(field = "overall_course_rate", title ="Overall Course Rating", type = "quantitative", format=".2f"),
+                        alt.Tooltip(field = "instructor", title ="Instructor", type = "nominal"),
+                        alt.Tooltip(field = "responses", title ="Responses", type = "quantitative")
+                ],
             ).properties(
                 title="Compare Course Ratings Over the years", 
                 width=750,
