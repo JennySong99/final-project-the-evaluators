@@ -86,10 +86,13 @@ if not _RELEASE:
     import altair as alt
     import numpy as np
     from utils import get_course_df
-    from utils import get_instructor_df
+    # from utils import get_instructor_df
+    from utils import get_instructor_by_year_df
+    from utils import get_instructor_all_year_df
     from utils import get_dept_df
     from utils import get_course_df2
     from utils import get_dept_df2
+    from utils import get_dept_all_year_df
     from utils import options_map_to_columns
 
     # st.set_page_config(layout="wide")
@@ -145,10 +148,13 @@ if not _RELEASE:
     course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
     course_df["course_name_code"] = course_df["num"].astype(str) + ' ' + course_df["course_name"]
     course_df2 = get_course_df2(course_df)
-    instructor_df = get_instructor_df(df)
+    # instructor_df = get_instructor_df(df)
+    instructor_df_by_year = get_instructor_by_year_df(df)
+    instructor_df_all_year = get_instructor_all_year_df(df)
     dept_df = get_dept_df(df)
     dept_df["dept_name_college"] = dept_df["dept"] + ' '  + dept_df["college"]
     dept_df2 = get_dept_df2(dept_df)
+    dept_all_year_df = get_dept_all_year_df(df)
     options_map_to_column = options_map_to_columns
     # ------------------------------------------------------- #
     # Main
@@ -170,8 +176,8 @@ if not _RELEASE:
         # -- Top Trend Section -- #
         trend_cols = st.columns(3)
         top_courses = course_df.sort_values('overall_course_rate', ascending=False).head(5)
-        top_instructors = instructor_df.sort_values('overall_teaching_rate', ascending=False).head(5)
-        top_depts = instructor_df.sort_values(['overall_course_rate', 'overall_teaching_rate'], ascending=False).head(5)
+        top_instructors = instructor_df_all_year.sort_values('overall_teaching_rate', ascending=False).head(5)
+        top_depts = dept_all_year_df.sort_values(['overall_course_rate', 'overall_teaching_rate'], ascending=False).head(5)
         with trend_cols[0]:
             st.subheader("Top Courses")
             for index, row in top_courses.iterrows():
@@ -244,7 +250,7 @@ if not _RELEASE:
             tooltip=[
                 alt.Tooltip("num", title="Course Number"),
                 alt.Tooltip("course_name", title="Course Name"),
-                alt.Tooltip("hrs_per_week", title="Hrs per Week"),
+                alt.Tooltip("hrs_per_week", title="Hrs per Week", format=".2f"),
                 alt.Tooltip('year', title="Year")
             ]
         ).properties(
@@ -495,7 +501,12 @@ if not _RELEASE:
                 x = alt.X("year:N", title="Year"),
                 y= alt.Y("overall_course_rate", title="Overall Course Rate"),
                 color=alt.Color("dept_name_college:N", legend=alt.Legend(title="Department Name", labelFontSize=12)),
-                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2))
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                tooltip = [
+                    alt.Tooltip(field = "dept_name_college", title = "Department Name", type = "nominal"),
+                    alt.Tooltip(field = "year", title = "Year", type = "quantitative"),
+                    alt.Tooltip(field = "overall_course_rate", title ="Avg Overall Course Rating", type = "quantitative", format=".2f")
+                ]
             ).properties(
                 title="Compare Course Ratings Over the years", 
                 width=750,
@@ -512,7 +523,7 @@ if not _RELEASE:
         #--- 3. INSTRUCTOR SEARCH dataprep----#
 
         #Creating  a list of instructors for the search
-        instructor_list = instructor_df['instructor'].to_list()
+        instructor_list = instructor_df_all_year['instructor'].to_list()
 
         #---INSTRUCTOR SEARCH Streamlit component--#
         #options is the name of the array that contains selected options
@@ -530,10 +541,11 @@ if not _RELEASE:
         if(len(options_instructor)>0):
            
             st.markdown("""---""")
+            st.subheader("Compare instructors based on different metrics")
+
             # first chart
-            
-            filter_df1 = instructor_df.groupby(['instructor'])[options_columns].mean().reset_index()
-            filter_df = filter_df1.loc[instructor_df['instructor'].isin(options_instructor)]
+            filter_df1 = instructor_df_all_year.groupby(['instructor'])[options_columns].mean().reset_index()
+            filter_df = filter_df1.loc[instructor_df_all_year['instructor'].isin(options_instructor)]
 
             reshaped_filter_df = filter_df.melt(id_vars=['instructor'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='instructor').reset_index(drop=True)
             selection_legend = alt.selection_multi(fields=['instructor'], bind='legend')
@@ -559,6 +571,33 @@ if not _RELEASE:
             st.altair_chart(compare_inst_ratings)
 
             st.markdown("""---""")
+
+            st.subheader("Compare Instructors over time")
+
+
+            filter_df2 = instructor_df_by_year.loc[instructor_df_by_year['instructor'].isin(options_instructor)]
+
+            selection_legend = alt.selection_multi(fields=['instructor'], bind='legend')
+
+            compare_inst_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
+                x = alt.X("year:N", title="Year"),
+                y= alt.Y("overall_teaching_rate", title="Overall Teaching Rate"),
+                color=alt.Color("instructor:N", legend=alt.Legend(title="Instructor Name", labelFontSize=12)),
+                opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
+                tooltip = [
+                    alt.Tooltip(field = "instructor", title = "Instructor Name", type = "nominal"),
+                    alt.Tooltip(field = "year", title = "Year", type = "quantitative"),
+                    alt.Tooltip(field = "overall_teaching_rate", title ="Avg Overall Teaching Rating", type = "quantitative", format=".2f")
+                ]
+            ).properties(
+                title="Compare Instructor Ratings Over the years",
+                width=750,
+                height=500
+            ).add_selection(
+                selection_legend
+            )
+
+            st.altair_chart(compare_inst_rating_over_years)
             
 
     # st.write(currPage)
@@ -578,20 +617,3 @@ if not _RELEASE:
     # name_input = st.text_input("Enter a name", value="Streamlit")
     # num_clicks = my_component(name_input, key="foo")
     # st.markdown("You've clicked %s times!" % int(num_clicks))
-
-
-# import altair as alt
-# from vega_datasets import data
-
-# source = data.unemployment_across_industries.url
-
-# selection = alt.selection_multi(fields=['series'], bind='legend')
-
-# alt.Chart(source).mark_area().encode(
-#     alt.X('yearmonth(date):T', axis=alt.Axis(domain=False, format='%Y', tickSize=0)),
-#     alt.Y('sum(count):Q', stack='center', axis=None),
-#     alt.Color('series:N', scale=alt.Scale(scheme='category20b')),
-#     opacity=alt.condition(selection, alt.value(1), alt.value(0.2))
-# ).add_selection(
-#     selection
-# )
