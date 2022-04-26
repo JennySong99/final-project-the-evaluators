@@ -381,7 +381,7 @@ if not _RELEASE:
 
             compare_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
                 x = alt.X("year:N", title="Year"),
-                y= alt.Y("overall_course_rate"),
+                y= alt.Y("overall_course_rate", title="Overall Course Rate"),
                 color=alt.Color("course_name_code:N", legend=alt.Legend(title="Course Name", labelFontSize=12)),
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
                 # strokeDash="instructor_combined",
@@ -440,7 +440,7 @@ if not _RELEASE:
                 hrs_per_week = ('hrs_per_week', 'mean'),
                 responses=('responses', 'sum'))
             filter_df3 = filter_df1[columns_filter]
-        
+
 
             reshaped_filter_df = filter_df3.melt(id_vars=['dept_name_college', 'total_students', 'hrs_per_week', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='dept_name_college').reset_index(drop=True)
             selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
@@ -455,8 +455,8 @@ if not _RELEASE:
                     responses = row['responses']
                     st.text("Name: {} \n Total Students: {:d} \n Hrs per Week: {:.2f} \n Responses: {:d}".format(course_name, int(total_students), hrs_per_week, int(responses)))
                     # st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor + "\n"+ "Hrs per Week: "+ str(hrs_per_week) + "\n"+ "Responses: "+ str(responses))
-            
-            
+
+
             st.markdown("""---""")
 
             st.subheader("Compare departments based on different metrics")
@@ -486,27 +486,14 @@ if not _RELEASE:
             # second chart
             st.subheader("Compare departments over time")
 
-            # dept_df2 = dept_df.groupby(['dept_name_college','year'])['overall_course_rate'].mean().reset_index()
-
-            # filter_df2 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
-
-            # filter_df1 = dept_df.loc[dept_df['dept_name_college'].isin(options_dept)]
-            # filter_df3 = filter_df1[columns_filter]
-
-            filter_df1 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
-
-            columns_filter = options_columns + ['dept_name_college', 'total_students', 'hrs_per_week', 'responses']
-
-
-            filter_df3 = filter_df1[columns_filter]
-
-
+            columns_filter = options_columns + ['dept_name_college', 'total_students', 'hrs_per_week', 'responses', 'year']
+            filter_dept_df = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
+            formatted_filter_dept_df = filter_dept_df[columns_filter]
             selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
-            
 
-            compare_dept_rating_over_years = alt.Chart(filter_df3).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
+            compare_dept_rating_over_years = alt.Chart(formatted_filter_dept_df).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
                 x = alt.X("year:N", title="Year"),
-                y= alt.Y("overall_course_rate"),
+                y= alt.Y("overall_course_rate", title="Overall Course Rate"),
                 color=alt.Color("dept_name_college:N", legend=alt.Legend(title="Department Name", labelFontSize=12)),
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2))
             ).properties(

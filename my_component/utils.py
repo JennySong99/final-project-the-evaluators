@@ -94,7 +94,7 @@ def get_dept_df(df):
     return dept_df
 
 def get_dept_df2(dept_df):
-    dept_df2 = dept_df.groupby(['dept_name_college', 'year', 'semester']).agg(
+    dept_df2 = dept_df.groupby(['dept_name_college', 'year']).agg(
         total_students=('total_students', 'sum'),
         hrs_per_week = ('hrs_per_week', 'mean'),
         responses=('responses', 'sum'), 
