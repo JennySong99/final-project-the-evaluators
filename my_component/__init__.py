@@ -88,6 +88,8 @@ if not _RELEASE:
     from utils import get_course_df
     from utils import get_instructor_df
     from utils import get_dept_df
+    from utils import get_course_df2
+    from utils import get_dept_df2
     from utils import options_map_to_columns
 
     # st.set_page_config(layout="wide")
@@ -140,8 +142,13 @@ if not _RELEASE:
     # Do not modify main df dataframe.
     df = load_data()
     course_df = get_course_df(df)
+    course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
+    course_df["course_name_code"] = course_df["num"].astype(str) + ' ' + course_df["course_name"]
+    course_df2 = get_course_df2(course_df)
     instructor_df = get_instructor_df(df)
     dept_df = get_dept_df(df)
+    dept_df["dept_name_college"] = dept_df["dept"] + ' '  + dept_df["college"]
+    dept_df2 = get_dept_df2(dept_df)
     options_map_to_column = options_map_to_columns
     # ------------------------------------------------------- #
     # Main
@@ -271,15 +278,15 @@ if not _RELEASE:
         #--- 1. COURSE SEARCH dataprep----#
 
         #Adding concatenation to distinguish same course names
-        course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
-        course_df["course_name_code"] = course_df["num"].astype(str) + ' ' + course_df["course_name"]
+        # course_df["course_name_code_year"] = course_df["year"].astype(str) + ' ' + course_df["semester"] + ' '  + course_df["num"].astype(str) + ' ' + course_df["course_name"]
+        # course_df["course_name_code"] = course_df["num"].astype(str) + ' ' + course_df["course_name"]
         #Creating  a list of latest courses for the search
         course_list = course_df.loc[course_df['year']> 2020]['course_name_code_year'].to_list()
 
         #---- COURSE SEARCH Streamlit component---#
         #options is the name of the array that contains selected options
         course_options = st.multiselect('Select courses for comparison', course_list)
-        courseCodeArray = [course_string.split(' ')[2] for course_string in course_options]
+        courseCodeArray = [" ".join(course_string.split(' ')[2:]) for course_string in course_options]
        
         options = st.multiselect(
         'Please Select Features You Want to Compare',
@@ -297,17 +304,28 @@ if not _RELEASE:
         
 
         if(course_options_length>0):
-            filter_df1 = course_df.groupby(['course_name_code_year', 'instructor', 'responses'])[options_columns].mean().reset_index()
-            filter_df = filter_df1.loc[course_df['course_name_code_year'].isin(course_options)]
-            reshaped_filter_df = filter_df.melt(id_vars=['course_name_code_year', 'instructor', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
             
+            # filter_df1 = course_df.groupby(['course_name_code_year', 'instructor'])[options_columns].mean().reset_index()
+            # st.write(filter_df1)
+            # filter_df = filter_df1.loc[course_df['course_name_code_year'].isin(course_options)]
+            # reshaped_filter_df = filter_df.melt(id_vars=['course_name_code_year', 'instructor', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
+            
+            filter_df1 = course_df2.loc[course_df2['course_name_code_year'].isin(course_options)]
+            columns_filter = options_columns + ['course_name_code_year', 'instructor_combined', 'hrs_per_week', 'responses']
+
+            filter_df1 = filter_df1[columns_filter]
+            reshaped_filter_df = filter_df1.melt(id_vars=['course_name_code_year', 'instructor_combined', 'hrs_per_week', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
+           
             with st.expander("See Detail Course Info"):
                 # cols = st.columns(course_options_length)
 
-                for index, row in reshaped_filter_df.iterrows():
+                for index, row in filter_df1.iterrows():
                     course_name = row['course_name_code_year']
-                    instructor = row['instructor']
-                    st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor)
+                    instructor = row['instructor_combined']
+                    hrs_per_week = row['hrs_per_week']
+                    responses = row['responses']
+                    st.text("Name: {} \n Instructor: {} \n Hrs per Week: {:.2f} \n Responses: {:d}".format(course_name, instructor, hrs_per_week, int(responses)))
+                    # st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor + "\n"+ "Hrs per Week: "+ str(hrs_per_week) + "\n"+ "Responses: "+ str(responses))
                     
            
             st.markdown("""---""")
@@ -347,11 +365,16 @@ if not _RELEASE:
             # second chart
             st.subheader("Compare courses over time")
 
-            course_df2 = course_df.groupby(['course_name_code','year']).agg(course_name=('course_name', 'max'), responses=('responses', 'mean'), num=('num', 'max'), instructor_combined=('instructor', lambda x: ' - '.join(x)), overall_course_rate=('overall_course_rate', 'mean'))
+            # course_df2 = course_df.groupby(['course_name_code','year']).agg(
+            #     course_name=('course_name', 'max'), 
+            #     responses=('responses', 'mean'), 
+            #     num=('num', 'max'), 
+            #     instructor_combined=('instructor', lambda x: ' - '.join(x)), 
+            #     overall_course_rate=('overall_course_rate', 'mean'))
 
-            course_df2 = course_df2.reset_index()
+            # course_df2 = course_df2.reset_index()
             # st.write(course_df2.head(50))
-            filter_df2 = course_df2.loc[course_df2['num'].isin(courseCodeArray)]
+            filter_df2 = course_df2.loc[course_df2['course_name_code'].isin(courseCodeArray)]
             # st.write(filter_df2)
             selection_legend = alt.selection_multi(fields=['course_name_code'], bind='legend')
 
@@ -384,7 +407,7 @@ if not _RELEASE:
     elif curr_page == 2:
         st.header("Compare Departments")
         #Creating  a list of department for the search
-        dept_df["dept_name_college"] = dept_df["dept"] + ' '  + dept_df["college"]
+        # dept_df["dept_name_college"] = dept_df["dept"] + ' '  + dept_df["college"]
         dept_list = set(dept_df['dept_name_college'].to_list())
 
         #--- DEPARTMENT SEARCH Streamlit component --#
@@ -400,13 +423,43 @@ if not _RELEASE:
 
         # convert options to column names
         options_columns = [options_map_to_column[option] for option in options]
+        print(options_dept)
 
         if(len(options_dept)>0):
+            # filter_df1 = dept_df.loc[dept_df['year'] == 2021]
+            # filter_df2 = filter_df1.groupby(['dept_name_college'])[options_columns].mean().reset_index()
+            # filter_df3 = filter_df2.loc[filter_df2['dept_name_college'].isin(options_dept)]
+
             filter_df1 = dept_df.loc[dept_df['year'] == 2021]
-            filter_df2 = filter_df1.groupby(['dept_name_college'])[options_columns].mean().reset_index()
-            filter_df3 = filter_df2.loc[filter_df2['dept_name_college'].isin(options_dept)]
-            reshaped_filter_df = filter_df3.melt(id_vars=['dept_name_college'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='dept_name_college').reset_index(drop=True)
+            filter_df1 = filter_df1.loc[filter_df1['dept_name_college'].isin(options_dept)]
+
+            columns_filter = options_columns + ['dept_name_college', 'total_students', 'hrs_per_week', 'responses']
+            filter_df2 = filter_df1[columns_filter].groupby(['dept_name_college']).agg(
+                dept_name_college = ('dept_name_college', 'first'),
+                total_students=('total_students', 'sum'),
+                hrs_per_week = ('hrs_per_week', 'mean'),
+                responses=('responses', 'sum'))
+            filter_df3 = filter_df1[columns_filter]
+        
+
+            reshaped_filter_df = filter_df3.melt(id_vars=['dept_name_college', 'total_students', 'hrs_per_week', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='dept_name_college').reset_index(drop=True)
             selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
+
+            with st.expander("See Detail Course Info"):
+                # cols = st.columns(course_options_length)
+
+                for index, row in filter_df2.iterrows():
+                    course_name = row['dept_name_college']
+                    total_students = row['total_students']
+                    hrs_per_week = row['hrs_per_week']
+                    responses = row['responses']
+                    st.text("Name: {} \n Total Students: {:d} \n Hrs per Week: {:.2f} \n Responses: {:d}".format(course_name, int(total_students), hrs_per_week, int(responses)))
+                    # st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor + "\n"+ "Hrs per Week: "+ str(hrs_per_week) + "\n"+ "Responses: "+ str(responses))
+            
+            
+            st.markdown("""---""")
+
+            st.subheader("Compare departments based on different metrics")
 
             compare_dept_ratings = alt.Chart(reshaped_filter_df).mark_bar(tooltip=True).transform_calculate(
                 y="split(datum.y, '_')"
@@ -417,7 +470,7 @@ if not _RELEASE:
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
                 row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
             ).properties(
-                title="Compare Ratings for Selected Departments from 2021", 
+                title="Compare Ratings for Selected Departments", 
                 width=400,
             ).configure_title(
                 anchor='middle',
@@ -431,14 +484,27 @@ if not _RELEASE:
             st.markdown("""---""")
 
             # second chart
-            dept_df2 = dept_df.groupby(['dept_name_college','year'])['overall_course_rate'].mean().reset_index()
+            st.subheader("Compare departments over time")
 
-            filter_df2 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
+            # dept_df2 = dept_df.groupby(['dept_name_college','year'])['overall_course_rate'].mean().reset_index()
+
+            # filter_df2 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
+
+            # filter_df1 = dept_df.loc[dept_df['dept_name_college'].isin(options_dept)]
+            # filter_df3 = filter_df1[columns_filter]
+
+            filter_df1 = dept_df2.loc[dept_df2['dept_name_college'].isin(options_dept)]
+
+            columns_filter = options_columns + ['dept_name_college', 'total_students', 'hrs_per_week', 'responses']
+
+
+            filter_df3 = filter_df1[columns_filter]
+
 
             selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
             
 
-            compare_dept_rating_over_years = alt.Chart(filter_df2).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
+            compare_dept_rating_over_years = alt.Chart(filter_df3).mark_line(point=alt.OverlayMarkDef(size=100), tooltip=True).encode(
                 x = alt.X("year:N", title="Year"),
                 y= alt.Y("overall_course_rate"),
                 color=alt.Color("dept_name_college:N", legend=alt.Legend(title="Department Name", labelFontSize=12)),
