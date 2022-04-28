@@ -18,7 +18,7 @@ _RELEASE = True
 # your component frontend. Everything else we do in this file is simply a
 # best practice.
 
-if _RELEASE:
+if not _RELEASE:
     _component_func = components.declare_component(
         # We give the component a simple, descriptive name ("my_component"
         # does not fit this bill, so please choose something better for your
