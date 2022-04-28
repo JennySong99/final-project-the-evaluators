@@ -322,7 +322,7 @@ if not _RELEASE:
             filter_df1 = filter_df1[columns_filter]
             reshaped_filter_df = filter_df1.melt(id_vars=['course_name_code_year', 'instructor_combined', 'hrs_per_week', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='course_name_code_year').reset_index(drop=True)
            
-            with st.expander("See Detail Course Info"):
+            with st.expander("See Detailed Course Info"):
                 # cols = st.columns(course_options_length)
 
                 for index, row in filter_df1.iterrows():
@@ -351,7 +351,7 @@ if not _RELEASE:
                 row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
                 tooltip = [alt.Tooltip(field = "course_name_code_year", title = "Course Name", type = "nominal"),
                         alt.Tooltip(field = "Rating", title ="Rating", type = "quantitative", format=".2f"),
-                        alt.Tooltip(field = "instructor", title ="Instructor", type = "nominal"),
+                        alt.Tooltip(field = "instructor_combined", title ="Instructor", type = "nominal"),
                         alt.Tooltip(field = "responses", title ="Responses", type = "quantitative")
                 ],
             ).properties(
@@ -451,7 +451,7 @@ if not _RELEASE:
             reshaped_filter_df = filter_df3.melt(id_vars=['dept_name_college', 'total_students', 'hrs_per_week', 'responses'], var_name = 'Judge Parameter', value_name = 'Rating').sort_values(by='dept_name_college').reset_index(drop=True)
             selection_legend = alt.selection_multi(fields=['dept_name_college'], bind='legend')
 
-            with st.expander("See Detail Course Info"):
+            with st.expander("See Detailed Department Info"):
                 # cols = st.columns(course_options_length)
 
                 for index, row in filter_df2.iterrows():
@@ -459,7 +459,7 @@ if not _RELEASE:
                     total_students = row['total_students']
                     hrs_per_week = row['hrs_per_week']
                     responses = row['responses']
-                    st.text("Name: {} \n Total Students: {:d} \n Hrs per Week: {:.2f} \n Responses: {:d}".format(course_name, int(total_students), hrs_per_week, int(responses)))
+                    st.text("Name: {} \n Total Students: {:d} \n Avg Hrs per Week: {:.2f} \n Total Responses: {:d}".format(course_name, int(total_students), hrs_per_week, int(responses)))
                     # st.text("Name: "+ course_name + "\n"+ "Instructor: "+ instructor + "\n"+ "Hrs per Week: "+ str(hrs_per_week) + "\n"+ "Responses: "+ str(responses))
 
 
@@ -558,6 +558,10 @@ if not _RELEASE:
                 color=alt.Color('instructor:N',legend=alt.Legend(title="Instructor ", labelFontSize=12)),
                 opacity=alt.condition(selection_legend, alt.value(1), alt.value(0.2)),
                 row=alt.Row('Judge Parameter:N', header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=8)),
+                tooltip = [
+                    alt.Tooltip(field = "instructor", title = "Instructor Name", type = "nominal"),
+                    alt.Tooltip(field = "Rating", title ="Avg Rating", type = "quantitative", format=".2f")
+                ]
             ).properties(
                 title="Compare Ratings for Selected Instructors", 
                 width=400,
