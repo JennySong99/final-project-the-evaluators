@@ -4,7 +4,9 @@
 
 **Video URL**: [Video Presentation](https://drive.google.com/file/d/1wZm0hQv7E3lZ9IOPLl0j1T_6UTphbapW/view?usp=sharing)
 
-Short (~250 words) abstract of the concrete data science problem and how the solutions addresses the problem.
+## Abstract
+
+Course Evaluations are very critical and important for students as it helps them choose the right subjects for themselves and build their semester schedules. However, just seeing the results of course evaluations and making a decision is an arduous and tedious process. Thus, identifying this problem that is faced by most college students we proposed to build a website which helps students visualize this information and interact with the visualizations. Moreover, we depict the current trends as part of our home page, which describes the top courses, top instructors and top departments. We develop various modules to compare courses, instructors and departments. These modules help students answer a lot of their questions while selecting a course, such as if a course is offered by 2 instructors which is the better instructor, which professor gives less work and assignments and which professor might be more engaged with students. We also have built a search module for our project application which helps user search based on keywords. In our comparison module we also show the trend over the years, so if a course which had high rating before, but it has dropped over the years it might imply that course content is no longer that relevant. Thus, with our visualizations we facilitate users to gain potential insights about the course which might be critical in the decision making process. As part of our future work we would like to build a comprehensive application that gives course recommendations to users and also suggest alternative courses when a course is waitlisted or full.
 
 ## Introduction
 
