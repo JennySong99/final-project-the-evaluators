@@ -51,17 +51,10 @@ The application is split into 4 pages based on the use cases and objectives of t
 
 The homepage is the first page that the users will face, therefore, the goal of this page is to give an overview and trends of the CMU’s courses. We first display the top 5 rated courses (Figure 1), departments, and instructors to the users. Also, the courses explorer visualization (Figure 2) is provided at the bottom to allow the users to explore the trend of the course based on 2 metrics (overall course rate, and overall teaching rate) by themselves.
 
-<div style="display: flex; justify-content: space-between">
-  <div style="display: flex; flex-direction: row; align-items: center; flex-grow: 1;">
-    <img src="images/homepage-toprated.png" alt="figure 1 - homepage top rated visualization" style="border: 1px solid grey">
-    <span style="font-size: 10px; color: grey">Figure 1- Top 5 rated section</span>
-  </div>
-  <div style="width:12px; height: 12px;"></div>
-  <div style="display: flex; flex-direction: row; align-items: center; flex-grow: 1;">
-    <img src="images/homepage-explorer.png" width="50%" alt="figure 2 - homepage explorer visualization" style="border: 1px solid grey">
-    <span style="font-size: 10px; color: grey">Figure 2 - Courses explorer visualization</span>
-  </div>
-</div>
+![](images/homepage-toprated.png) |  ![](images/homepage-explorer.png)
+:--------------------------------:|:-----------------------------------:
+_Figure 1- Top 5 rated section_   |  _Figure 2 - Courses explorer visualization_
+
 
 #### **2) Compare Courses**
 
@@ -75,17 +68,11 @@ The other one is the “Compare courses over time” (Figure 4). This visualizat
 
 - _“An alumni from 2018 said good things about a course. Have the ratings gone down from that point?”_
 
-<div style="display: flex; justify-content: space-between">
-  <div style="display: flex; flex-direction: row; align-items: center; flex-grow: 1;">
-    <img src="images/compare-compare.png" alt="figure 3 - Compare courses" style="border: 1px solid grey;">
-    <span style="font-size: 10px; color: grey">Figure 3- Compare courses based on different metrics</span>
-  </div>
-  <div style="width:12px; height: 12px;"></div>
-  <div style="display: flex; flex-direction: row; align-items: center; flex-grow: 1;">
-    <img src="images/compare-progress.png" alt="figure 4 - Compare courses over time" style="border: 1px solid grey">
-    <span style="font-size: 10px; color: grey">Figure 4 - Compare courses over time</span>
-  </div>
-</div>
+
+![](images/compare-compare.png) |  ![](images/compare-progress.png)
+:------------------------------:|:---------------------------------:
+_Figure 3 - Compare courses_    |  _Figure 4 - Compare courses over time_
+
 
 #### **3) Compare Departments**
 
