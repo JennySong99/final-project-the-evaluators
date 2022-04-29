@@ -9,7 +9,16 @@
   - udt@andrew.cmu.edu
   - psasapar@andrew.cmu.edu
 
-## Abstraction
+## Abstract
+
+
+![](images/homepage-toprated.png) |  ![](images/homepage-explorer.png)
+:--------------------------------:|:-----------------------------------:
+_Figure 1- Top 5 rated section_   |  _Figure 2 - Courses explorer visualization_
+
+![](images/compare-compare.png) |  ![](images/compare-progress.png)
+:------------------------------:|:---------------------------------:
+_Figure 3 - Compare courses_    |  _Figure 4 - Compare courses over time_
 
 ## Run the app
 
