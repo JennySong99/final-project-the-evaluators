@@ -35,7 +35,7 @@ After the data processing, the total number of instances is 35,896 instances.
 
 ### Visualization Methods
 
-- Streamlit & React (Jenny):
+- Streamlit & React
   - Since we design to have several pages, we used [Streamlit Component](https://github.com/streamlit/component-template/) to set up a REACT front end and developed a navigation bar to change page content. The rest of the code is written in Python backend.
 - Altair
   - Altair is a declarative statistical visualization library for Python, based on Vega and Vega-Lite. Altair offers a powerful and concise visualization grammar that enables you to build a wide range of statistical visualizations quickly. Altair, helps build pretty looking interactive visualizations, which can be customized greatly.
