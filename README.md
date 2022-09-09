@@ -1,6 +1,6 @@
 # CMU Interactive Data Science Final Project
 
-- **Online URL**: [https://share.streamlit.io/cmu-ids-2022/final-project-the-evaluators/main/my_component/](https://share.streamlit.io/cmu-ids-2022/final-project-the-evaluators/main/my_component/)
+- **Online URL**: [https://jennysong99-final-project-the-evalu-my-component--init---0arilj.streamlitapp.com/](https://jennysong99-final-project-the-evalu-my-component--init---0arilj.streamlitapp.com/)
 - [**Report**](Report.md)
 - [**Video Presentation**](https://drive.google.com/file/d/1wZm0hQv7E3lZ9IOPLl0j1T_6UTphbapW/view?usp=sharing)
 - **Team members**:
